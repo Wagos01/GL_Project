@@ -10,7 +10,6 @@ namespace Szeminarium1
         private static GL Gl;
 
         private static uint program;
-
         private static readonly string VertexShaderSource = @"
         #version 330 core
         layout (location = 0) in vec3 vPos;
@@ -155,6 +154,12 @@ namespace Szeminarium1
 
             };
 
+            //rubik kocka kicsi kockaja
+            /*for (int i=0; i<vertexArray.Length; i++) {
+                vertexArray[i] /= 3;
+            }*/
+
+
             float[] colorArray = new float[] {
                /* 1.0f, 0.0f, 0.0f, 1.0f,
                 0.0f, 1.0f, 0.0f, 1.0f,
@@ -178,8 +183,16 @@ namespace Szeminarium1
                 0.0f, 0.0f, 1.0f, 1.0f,
                 0.0f, 0.0f, 1.0f, 1.0f,
 
+                //vonalak
+                0.0f, 0.0f, 0.0f, 1.0f,
+                0.0f, 0.0f, 0.0f, 1.0f,
+                0.0f, 0.0f, 0.0f, 1.0f,
+
+
             };
 
+
+           
             uint[] indexArray = new uint[] {
                 // b, f,d
                 0,1,3,
@@ -192,12 +205,16 @@ namespace Szeminarium1
                 //a f e
                 9, 11, 10,
                 //a b f
-                9, 8, 11
+                9, 8, 11,
+
+                11, 10 ,11
             };
 
             uint vertices = Gl.GenBuffer();
             Gl.BindBuffer(GLEnum.ArrayBuffer, vertices);
             Gl.BufferData(GLEnum.ArrayBuffer, (ReadOnlySpan<float>)vertexArray.AsSpan(), GLEnum.StaticDraw);
+
+           
             Gl.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, null);
             Gl.EnableVertexAttribArray(0);
             
@@ -224,9 +241,34 @@ namespace Szeminarium1
             CheckError();
 
 
+
+
             Gl.DrawElements(GLEnum.Triangles, (uint)indexArray.Length, GLEnum.UnsignedInt, null); // we used element buffer
             Gl.BindBuffer(GLEnum.ElementArrayBuffer, 0);
             Gl.BindVertexArray(vao);
+
+
+            // Draw black lines
+            float[] lineVertices = new float[] {
+                -0.5f, -0.5f, 0.0f,
+                0.5f, 0.5f, 0.0f
+            };
+
+            uint lineVao = Gl.GenVertexArray();
+            Gl.BindVertexArray(lineVao);
+
+            uint lineVbo = Gl.GenBuffer();
+            Gl.BindBuffer(GLEnum.ArrayBuffer, lineVbo);
+            Gl.BufferData(GLEnum.ArrayBuffer, (ReadOnlySpan<float>)lineVertices.AsSpan(), GLEnum.StaticDraw);
+
+            Gl.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, null);
+            Gl.EnableVertexAttribArray(0);
+
+            Gl.DrawArrays(GLEnum.Lines, 0, 2);
+
+            Gl.BindBuffer(GLEnum.ArrayBuffer, 0);
+            Gl.BindVertexArray(0);
+
 
             CheckError();
 
@@ -236,6 +278,8 @@ namespace Szeminarium1
             Gl.DeleteBuffer(colors);
             Gl.DeleteBuffer(indices);
             Gl.DeleteVertexArray(vao);
+
+
 
             CheckError();
 
