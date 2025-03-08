@@ -243,15 +243,29 @@ namespace Szeminarium1
 
 
 
-            Gl.DrawElements(GLEnum.Triangles, (uint)indexArray.Length, GLEnum.UnsignedInt, null); // we used element buffer
+            Gl.DrawElements(GLEnum.Triangles, (uint)indexArray.Length, GLEnum.UnsignedInt, null); 
             Gl.BindBuffer(GLEnum.ElementArrayBuffer, 0);
             Gl.BindVertexArray(vao);
 
+            CheckError();
 
-            // Draw black lines
+
+            //rubik kocka vonalai
             float[] lineVertices = new float[] {
-                -0.5f, -0.5f, 0.0f,
-                0.5f, 0.5f, 0.0f
+                -0.5f / 3, 0.2f / 3, 0.0f,//teteje harmadolo
+                1f/3, 0.8f/3, 0.0f,
+
+              -1f/3, 0.4f /3, 0.0f,
+               0.5f/3,1f/3, 0.0f,
+
+
+               -1f/3,0.8f/3,0f,
+              0.5f/3,0.2f/3,0f,
+
+               -0.5f/3,1f/3,0f,
+              1/3f,0.4f/3,0f,
+
+
             };
 
             uint lineVao = Gl.GenVertexArray();
@@ -264,7 +278,7 @@ namespace Szeminarium1
             Gl.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, null);
             Gl.EnableVertexAttribArray(0);
 
-            Gl.DrawArrays(GLEnum.Lines, 0, 2);
+            Gl.DrawArrays(GLEnum.Lines, 0, 8);
 
             Gl.BindBuffer(GLEnum.ArrayBuffer, 0);
             Gl.BindVertexArray(0);
