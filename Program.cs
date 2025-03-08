@@ -262,9 +262,22 @@ namespace Szeminarium1
                -1f/3,0.8f/3,0f,
               0.5f/3,0.2f/3,0f,
 
-               -0.5f/3,1f/3,0f,
-              1/3f,0.4f/3,0f,
+                -0.5f/3,1f/3,0f,
+              1/3f,0.4f/3,0f,//k
 
+                0.5f/3,0.2f/3,0f,
+                0.5f/3,-1.6f/3,0f,
+
+
+              1/3f,0.4f/3,0f,//k
+                1f/3,-1.4f/3,0f,
+
+                0f,-0.6f/3,0f,
+               1.5f/3,0f,0f,
+
+
+                0f, -1.2f/3,0f,
+                1.5f/3,-0.6f/3,0f,
 
             };
 
@@ -278,7 +291,7 @@ namespace Szeminarium1
             Gl.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, null);
             Gl.EnableVertexAttribArray(0);
 
-            Gl.DrawArrays(GLEnum.Lines, 0, 8);
+            Gl.DrawArrays(GLEnum.Lines, 0, 16);
 
             Gl.BindBuffer(GLEnum.ArrayBuffer, 0);
             Gl.BindVertexArray(0);
