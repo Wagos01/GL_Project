@@ -265,13 +265,14 @@ namespace Szeminarium1
                 -0.5f/3,1f/3,0f,
               1/3f,0.4f/3,0f,//k
 
+              //jobb oldal lefele
                 0.5f/3,0.2f/3,0f,
                 0.5f/3,-1.6f/3,0f,
 
 
               1/3f,0.4f/3,0f,//k
                 1f/3,-1.4f/3,0f,
-
+            //jobb oldal oldalra
                 0f,-0.6f/3,0f,
                1.5f/3,0f,0f,
 
@@ -279,6 +280,22 @@ namespace Szeminarium1
                 0f, -1.2f/3,0f,
                 1.5f/3,-0.6f/3,0f,
 
+                //Bal oldal lefele
+                 -0.5f / 3, 0.2f / 3, 0.0f,
+                 -0.5f/3,-1.6f/3,0f,
+
+
+
+                 -1f/3, 0.4f /3, 0.0f,
+                 -1f/3, -1.4f/3, 0.0f,
+
+                 //Bal oldal oldalra
+
+                   0f,-0.6f/3,0f,
+                   -1.5f/3,0f,0f,
+
+                    0f, -1.2f/3,0f,
+                    -1.5f/3,-0.6f/3,0f,
             };
 
             uint lineVao = Gl.GenVertexArray();
@@ -291,7 +308,7 @@ namespace Szeminarium1
             Gl.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, null);
             Gl.EnableVertexAttribArray(0);
 
-            Gl.DrawArrays(GLEnum.Lines, 0, 16);
+            Gl.DrawArrays(GLEnum.Lines, 0, 24);
 
             Gl.BindBuffer(GLEnum.ArrayBuffer, 0);
             Gl.BindVertexArray(0);
