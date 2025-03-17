@@ -12,7 +12,7 @@ namespace GrafikaSzeminarium
 
         private static GL Gl;
 
-        private static ModelObjectDescriptor cube;
+        private static ModelObjectDescriptor[] cube = new ModelObjectDescriptor[27];
 
         private static CameraDescriptor camera = new CameraDescriptor();
 
@@ -73,7 +73,10 @@ namespace GrafikaSzeminarium
 
         private static void GraphicWindow_Closing()
         {
-            cube.Dispose();
+            for(int i=0;i<27; i++)
+            {
+                cube[i].Dispose();
+            }
             Gl.DeleteProgram(program);
         }
 
@@ -87,7 +90,11 @@ namespace GrafikaSzeminarium
                 keyboard.KeyDown += Keyboard_KeyDown;
             }
 
-            cube = ModelObjectDescriptor.CreateCube(Gl);
+            for (int i = 0; i < 27; i++)
+            {
+                cube[i] = ModelObjectDescriptor.CreateCube(Gl, i);
+            }
+
 
             Gl.ClearColor(System.Drawing.Color.White);
             
@@ -194,20 +201,23 @@ namespace GrafikaSzeminarium
 
             float dist = 0.31f;
 
-            for (float i =-1; i <= 1; i++)
+            int cubeIndex = 0;
+
+            for (float i = -1; i <= 1; i++)
             {
                 for (float j = -1; j <= 1; j++)
                 {
                     for (float k = -1; k <= 1; k++)
                     {
-
                         Matrix4X4<float> trans = Matrix4X4.CreateTranslation(i * dist, j * dist, k * dist);
                         Matrix4X4<float> modelMatrixRubicsScube = rubicsScale * trans;
                         SetMatrix(modelMatrixRubicsScube, ModelMatrixVariableName);
-                        DrawModelObject(cube);
+                        DrawModelObject(cube[cubeIndex]);
+                        cubeIndex++;
                     }
                 }
             }
+
         }
 
 
