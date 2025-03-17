@@ -22,6 +22,7 @@ namespace Szeminarium
         /// The value by which the center cube is scaled. It varies between 0.8 and 1.2 with respect to the original size.
         /// </summary>
         public double CenterCubeScale { get; private set; } = 1;
+        public double RubikCubeScale { get; private set; } = 0.3;
 
         /// <summary>
         /// The angle with which the diamond cube is rotated around the diagonal from bottom right front to top left back.

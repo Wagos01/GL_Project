@@ -157,7 +157,7 @@ namespace GrafikaSzeminarium
                     camera.DecreaseZXAngle();
                     break;
                 case Key.Space:
-                    cubeArrangementModel.AnimationEnabled = !cubeArrangementModel.AnimationEnabled;
+                    //cubeArrangementModel.AnimationEnabled = !cubeArrangementModel.AnimationEnabled;
                     break;
             }
         }
@@ -182,22 +182,34 @@ namespace GrafikaSzeminarium
             var projectionMatrix = Matrix4X4.CreatePerspectiveFieldOfView<float>((float)(Math.PI / 2), 1024f / 768f, 0.1f, 100f);
             SetMatrix(projectionMatrix, ProjectionMatrixVariableName);
 
+            DrawRubicsCube();
 
-            var modelMatrixCenterCube = Matrix4X4.CreateScale((float)cubeArrangementModel.CenterCubeScale);
-            SetMatrix(modelMatrixCenterCube, ModelMatrixVariableName);
-            DrawModelObject(cube);
 
-            Matrix4X4<float> diamondScale = Matrix4X4.CreateScale(0.25f);
-            Matrix4X4<float> rotx = Matrix4X4.CreateRotationX((float)Math.PI / 4f);
-            Matrix4X4<float> rotz = Matrix4X4.CreateRotationZ((float)Math.PI / 4f);
-            Matrix4X4<float> roty = Matrix4X4.CreateRotationY((float)cubeArrangementModel.DiamondCubeLocalAngle);
-            Matrix4X4<float> trans = Matrix4X4.CreateTranslation(1f, 1f, 0f);
-            Matrix4X4<float> rotGlobalY = Matrix4X4.CreateRotationY((float)cubeArrangementModel.DiamondCubeGlobalYAngle);
-            Matrix4X4<float> dimondCubeModelMatrix = diamondScale * rotx * rotz * roty * trans * rotGlobalY;
-            SetMatrix(dimondCubeModelMatrix, ModelMatrixVariableName);
-            DrawModelObject(cube);
 
         }
+
+        private static unsafe void DrawRubicsCube()
+        {
+            Matrix4X4<float> rubicsScale = Matrix4X4.CreateScale((float)cubeArrangementModel.RubikCubeScale);
+
+            float dist = 0.31f;
+
+            for (float i =-1; i <= 1; i++)
+            {
+                for (float j = -1; j <= 1; j++)
+                {
+                    for (float k = -1; k <= 1; k++)
+                    {
+
+                        Matrix4X4<float> trans = Matrix4X4.CreateTranslation(i * dist, j * dist, k * dist);
+                        Matrix4X4<float> modelMatrixRubicsScube = rubicsScale * trans;
+                        SetMatrix(modelMatrixRubicsScube, ModelMatrixVariableName);
+                        DrawModelObject(cube);
+                    }
+                }
+            }
+        }
+
 
         private static unsafe void DrawModelObject(ModelObjectDescriptor modelObject)
         {
