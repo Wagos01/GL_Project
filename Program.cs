@@ -14,6 +14,10 @@ namespace GrafikaSzeminarium
 
         private static ModelObjectDescriptor[] cube = new ModelObjectDescriptor[27];
 
+        private static Matrix4X4<float>[] cubeTransMatrix = new Matrix4X4<float>[27];//MInden kockanak egy sajat transzformacio matrix
+
+        private static List<int[]> rubicGroupIndexes = new List<int[]>(); //6 felekeppen lehet egy rubik kockat forgatni, itt a kicsi kockakat hozza rendeljuk a forgatasokhoz
+
         private static CameraDescriptor camera = new CameraDescriptor();
 
         private static CubeArrangementModel cubeArrangementModel = new CubeArrangementModel();
@@ -68,6 +72,7 @@ namespace GrafikaSzeminarium
             graphicWindow.Render += GraphicWindow_Render;
             graphicWindow.Closing += GraphicWindow_Closing;
 
+
             graphicWindow.Run();
         }
 
@@ -93,8 +98,16 @@ namespace GrafikaSzeminarium
             for (int i = 0; i < 27; i++)
             {
                 cube[i] = ModelObjectDescriptor.CreateCube(Gl, i);
+                cubeTransMatrix[i] = Matrix4X4<float>.Identity;
             }
 
+            for(int i = 0; i < 6; i++)
+            {
+                rubicGroupIndexes.Add(new int[9]);//1 oldalon 9 kocka van, 1 forgatassal 9 kocka forgatodik
+            }
+
+
+            SetUpRotations();
 
             Gl.ClearColor(System.Drawing.Color.White);
             
@@ -164,8 +177,18 @@ namespace GrafikaSzeminarium
                     camera.DecreaseZXAngle();
                     break;
                 case Key.Space:
-                    //cubeArrangementModel.AnimationEnabled = !cubeArrangementModel.AnimationEnabled;
+                    cubeArrangementModel.AnimationEnabled = !cubeArrangementModel.AnimationEnabled;
                     break;
+                case Key.Number1:
+                case Key.Number2:
+                case Key.Number3:
+                case Key.Number4:
+                case Key.Number5:
+                case Key.Number6:
+                    cubeArrangementModel.RotateGroup(rubicGroupIndexes[key - Key.Number1], ref cubeTransMatrix);
+                    graphicWindow.DoRender();
+                    break;
+
             }
         }
 
@@ -210,7 +233,7 @@ namespace GrafikaSzeminarium
                     for (float k = -1; k <= 1; k++)
                     {
                         Matrix4X4<float> trans = Matrix4X4.CreateTranslation(i * dist, j * dist, k * dist);
-                        Matrix4X4<float> modelMatrixRubicsScube = rubicsScale * trans;
+                        Matrix4X4<float> modelMatrixRubicsScube = rubicsScale * trans * cubeTransMatrix[cubeIndex];
                         SetMatrix(modelMatrixRubicsScube, ModelMatrixVariableName);
                         DrawModelObject(cube[cubeIndex]);
                         cubeIndex++;
@@ -241,6 +264,33 @@ namespace GrafikaSzeminarium
             Gl.UniformMatrix4(location, 1, false, (float*)&mx);
             CheckError();
         }
+
+        //6 felekeppen lehet egy rubik kockat forgatni,
+        //itt a kicsi kockakat hozza rendeljuk a forgatasokhoz
+        private static void SetUpRotations()
+        {
+            //az elso 3 a vizszintes forgatasok
+            //masodik 3 a fuggoleges forgatasok
+            rubicGroupIndexes[0] = (new int[] { 0, 1, 2, 9, 10, 11, 18, 19, 20 });
+            rubicGroupIndexes[1] = (new int[] { 3, 4, 5, 12, 13, 14, 21, 22, 23 });
+            rubicGroupIndexes[2] = (new int[] { 6, 7, 8, 15, 16, 17, 24, 25, 26 }); 
+
+            for (int i = 3; i < 6; i++) {
+                for(int j = 0; j < 9; j++) {
+                    rubicGroupIndexes[i][j] = (i-3)*9 + j;
+                }
+            }
+
+            /*for(int i = 0; i < 6; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    Console.Write(rubicGroupIndexes[i][j] + " ");
+                }
+                Console.WriteLine();
+            }*/
+        }
+
 
         public static void CheckError()
         {
