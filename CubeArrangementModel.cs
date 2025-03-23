@@ -39,8 +39,8 @@ namespace Szeminarium
         /// </summary>
         public double DiamondCubeGlobalYAngle { get; private set; } = 0;
 
-
-
+        ///forgatas iranya
+        public int direction { get;  set; } = 0;
 
 
         internal void AdvanceTime(double deltaTime)
@@ -61,98 +61,37 @@ namespace Szeminarium
             DiamondCubeGlobalYAngle = -Time;
         }
 
-        internal void RotateHorizontalGroup(int index, ref Matrix4X4<float>[] cubeTransMatrix) { 
-            Matrix4X4<float> rotation = Matrix4X4.CreateRotationY(MathF.PI / 2);
-           
-            index = 3 * index;
 
-            int[] newOrder = new int[9];
-         
-            int move = 0;
-            int index2 = index;
-
-            int[] indexes = new int[9];
-            int i = 0;
-
-            while (i < 9) {
-                indexes[i] = index;
-                index++;
-                move++;
-                if (move == 3) {
-                    index += 6;
-                    move = 0;
-                }
-                i++;
-                //Console.Write(indexes[i-1]+" ");
-            }
-            //Console.WriteLine();
-
-            for (i = 0; i < 9; i++)
+        public void Rotate(int cubeLayer, char axis, ref Matrix4X4<float>[] cubeTransMatrix)
+        {
+            //Megcsinaljuk a megfelelo forgato matrixot
+            Matrix4X4<float> rotation;
+            switch (axis)
             {
-                cubeTransMatrix[Program.globalStatus[indexes[i]]] = rotation * cubeTransMatrix[Program.globalStatus[indexes[i]]];
+                case 'X': rotation = Matrix4X4.CreateRotationX(MathF.PI / 2 * direction); break;
+                case 'Y': rotation = Matrix4X4.CreateRotationY(MathF.PI / 2 * direction); break;
+                case 'Z': rotation = Matrix4X4.CreateRotationZ(MathF.PI / 2 * direction); break;
+                default: return; // rossz tengely
             }
 
+            List<float[]> newRubicsCube = new List<float[]>(Program.RubicsCube);
+            List<int> layerIndexes = new List<int>(GetLayerIndexes(axis, cubeLayer));
 
-            newOrder[0] = Program.globalStatus[indexes[2]];
-            newOrder[1] = Program.globalStatus[indexes[5]];
-            newOrder[2] = Program.globalStatus[indexes[8]];
-            newOrder[3] = Program.globalStatus[indexes[1]];
-            newOrder[4] = Program.globalStatus[indexes[4]];
-            newOrder[5] = Program.globalStatus[indexes[7]];
-            newOrder[6] = Program.globalStatus[indexes[0]];
-            newOrder[7] = Program.globalStatus[indexes[3]];
-            newOrder[8] = Program.globalStatus[indexes[6]];
-
-
-            for (i = 0; i < 9; i++)
+            foreach (int index in layerIndexes)
             {
-                Program.globalStatus[indexes[i]] = newOrder[i];
-
-                //Write out
-               // Console.Write(Program.globalStatus[indexes[i]] + " ");
+                cubeTransMatrix[index] = rotation * cubeTransMatrix[index];
             }
 
+            //Todo
 
-
-          //  Console.WriteLine();
 
         }
 
-        internal void RotateVerticalGroup(int index, ref Matrix4X4<float>[] cubeTransMatrix) {
-            Matrix4X4<float> rotation = Matrix4X4.CreateRotationX( MathF.PI / 2);
-            
-            index = 9* index;
-           
-            int[] newOrder = new int[9];
-
-            for (int i = index; i < index + 9; i++)
-            {
-                cubeTransMatrix[Program.globalStatus[i]]= rotation * cubeTransMatrix[Program.globalStatus[i]];
-            }
-
-            newOrder[0] = Program.globalStatus[index+2];
-            newOrder[1] = Program.globalStatus[index+5];
-            newOrder[2] = Program.globalStatus[index+8];
-            newOrder[3] = Program.globalStatus[index + 1];
-            newOrder[4] = Program.globalStatus[index + 4];
-            newOrder[5] = Program.globalStatus[index + 7];
-            newOrder[6] = Program.globalStatus[index + 0];
-            newOrder[7] = Program.globalStatus[index + 3];
-            newOrder[8] = Program.globalStatus[index + 6];
-
-
-            for (int i = index; i < index + 9; i++)
-            {
-                Program.globalStatus[i] = newOrder[i - index];
-
-                //Console.Write(Program.globalStatus[i] + " ");
-            }
-
-            //Console.WriteLine();
-
+        private static int[] GetLayerIndexes(char axis, int layer)
+        {
+            //TODO
+            throw new NotImplementedException();
         }
-       
 
-       
     }
 }

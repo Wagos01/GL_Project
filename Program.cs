@@ -15,7 +15,7 @@ namespace GrafikaSzeminarium
 
         private static ModelObjectDescriptor[] cube = new ModelObjectDescriptor[27];
 
-        private static Matrix4X4<float>[] cubeTransMatrix = new Matrix4X4<float>[27];//MInden kockanak egy sajat transzformacio matrix
+        public static Matrix4X4<float>[] cubeTransMatrix = new Matrix4X4<float>[27];//MInden kockanak egy sajat transzformacio matrix
 
         private static CameraDescriptor camera = new CameraDescriptor();
 
@@ -25,8 +25,6 @@ namespace GrafikaSzeminarium
         private const string ViewMatrixVariableName = "uView";
         private const string ProjectionMatrixVariableName = "uProjection";
 
-
-        public static int[] globalStatus = new int[27];
 
         public static List<float[]> RubicsCube = new List<float[]>();
 
@@ -104,8 +102,6 @@ namespace GrafikaSzeminarium
             {
                 cube[i] = ModelObjectDescriptor.CreateCube(Gl, i);
                 cubeTransMatrix[i] = Matrix4X4<float>.Identity;
-                globalStatus[i] = i;
-
             }
            
             for (int i = -1; i <= 1; i++)
@@ -191,34 +187,28 @@ namespace GrafikaSzeminarium
                     camera.DecreaseZXAngle();
                     break;
                 case Key.Space:
-                    cubeArrangementModel.AnimationEnabled = !cubeArrangementModel.AnimationEnabled;
+                    cubeArrangementModel.direction = cubeArrangementModel.direction * (-1);
                     break;
+
                 case Key.Number1:   
                 case Key.Number2:
                 case Key.Number3:
                     index = key - Key.Number1;
-                    cubeArrangementModel.RotateHorizontalGroup(index, ref cubeTransMatrix);
+                    cubeArrangementModel.Rotate(index,'X', ref cubeTransMatrix);
                     break;
                 case Key.Number4:
                 case Key.Number5:
                 case Key.Number6:
                     index = key - Key.Number1;
-                    cubeArrangementModel.RotateVerticalGroup(index-3, ref cubeTransMatrix);
+                    cubeArrangementModel.Rotate(index-3,'Y' ,ref cubeTransMatrix);
                     break;
                 case Key.Number7:
                 case Key.Number8:
                 case Key.Number9:
-                    index = key - Key.Number1;
+                    cubeArrangementModel.Rotate(index - 6,'Z',ref cubeTransMatrix);
                     break;
             }
 
-            //Write out the global status of the cubes
-
-            for (int i = 0; i < 27; i++)
-            {
-                Console.Write(globalStatus[i] + " ");
-            }
-            Console.WriteLine();
 
 
             //if(index != -1 && index<4)
@@ -253,7 +243,6 @@ namespace GrafikaSzeminarium
             DrawRubicsCube();
 
 
-
         }
 
         private static unsafe void DrawRubicsCube()
@@ -271,7 +260,7 @@ namespace GrafikaSzeminarium
                     for (float k = -1; k <= 1; k++)
                     {
                         Matrix4X4<float> trans = Matrix4X4.CreateTranslation(i * dist, j * dist, k * dist);
-                        Matrix4X4<float> modelMatrixRubicsScube = rubicsScale * trans * cubeTransMatrix[globalStatus[cubeIndex]];
+                        Matrix4X4<float> modelMatrixRubicsScube = rubicsScale * trans * cubeTransMatrix[cubeIndex];
                         SetMatrix(modelMatrixRubicsScube, ModelMatrixVariableName);
                         DrawModelObject(cube[cubeIndex]);
                         cubeIndex++;
