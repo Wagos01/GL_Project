@@ -193,31 +193,38 @@ namespace GrafikaSzeminarium
                 case Key.Number1:   
                 case Key.Number2:
                 case Key.Number3:
+                    if(CubeArrangementModel.isRotating)
+                    {
+                        break;
+                    }
                     index = key - (Key.Number1+1);
-                    cubeArrangementModel.Rotate(index,'X', ref cubeTransMatrix);
+                    cubeArrangementModel.Rotate(index,'X');
                     break;
                 case Key.Number4:
                 case Key.Number5:
                 case Key.Number6:
+                    if (CubeArrangementModel.isRotating)
+                    {
+                        break;
+                    }
                     index = key - (Key.Number1 + 1);
-                    cubeArrangementModel.Rotate(index-3,'Y' ,ref cubeTransMatrix);
+                    cubeArrangementModel.Rotate(index-3,'Y' );
                     break;
                 case Key.Number7:
                 case Key.Number8:
                 case Key.Number9:
+                    if (CubeArrangementModel.isRotating)
+                    {
+                        break;
+                    }
                     index = key - (Key.Number1 + 1);
-                    cubeArrangementModel.Rotate(index - 6,'Z',ref cubeTransMatrix);
+                    cubeArrangementModel.Rotate(index - 6,'Z');
                     break;
             }
 
 
 
-            //if(index != -1 && index<4)
-            //{
-            //    var newGroup = rubicGroupIndexes[index];
-            //    cubeArrangementModel.CubeMatrixRearrange(ref newGroup);
-            //    rubicGroupIndexes[index] = newGroup;
-            //}
+          
 
         }
 
@@ -250,7 +257,7 @@ namespace GrafikaSzeminarium
         {
             Matrix4X4<float> rubicsScale = Matrix4X4.CreateScale((float)cubeArrangementModel.RubikCubeScale);
 
-            float dist = 0.35f;
+            float dist = 0.32f;
 
             int cubeIndex = 0;
 

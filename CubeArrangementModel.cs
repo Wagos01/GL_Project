@@ -42,47 +42,93 @@ namespace Szeminarium
         ///forgatas iranya
         public float direction { get;  set; } = 1;
 
+        public static bool isRotating { get; private set; } = false;
+
+        private float angleToRotate = (float)(Math.PI / 2f);//in radian
+        private float angleRotated = 0.0f;
+        // private float rotationTime = 0.5f;
+
+        private char currentAxis;
+        private int currentLayer;
+        //cubeTransMatrix
 
         internal void AdvanceTime(double deltaTime)
         {
-            // we do not advance the simulation when animation is stopped
-            if (!AnimationEnabled)
-                return;
+            if (isRotating)
+            {
+                angleRotated += 2*(float)deltaTime;
 
-            // set a simulation time
-            Time += deltaTime;
+                if (angleRotated >= angleToRotate)
+                {
+                    isRotating = false;
+                    angleRotated = 0.0f;
 
-            // lets produce an oscillating scale in time
-            CenterCubeScale = 1 + 0.2 * Math.Sin(1.5 * Time);
+                    List<int> layerIndexes = new List<int>(GetLayerIndexes(currentAxis, currentLayer));
+                    List<float[]> newRubicsCube = new List<float[]>(Program.RubicsCube);
 
-            // the rotation angle is time x angular velocity;
-            DiamondCubeLocalAngle = Time * 10;
+                    foreach (int index in layerIndexes)
+                    {
+                        Program.RubicsCube[index] = UpdateCubePosition(newRubicsCube[index], currentAxis);
+                    }
+                }
+                else
+                {
+                    RotateLayer(currentLayer, currentAxis,2* (float)deltaTime);
 
-            DiamondCubeGlobalYAngle = -Time;
+                }
+            }
+            
         }
 
-
-        public void Rotate(int cubeLayer, char axis, ref Matrix4X4<float>[] cubeTransMatrix)
+        public void Rotate(int cubeLayer, char axis)
         {
+            if(!isRotating)
+            {
+                isRotating = true;
+                angleRotated = 0.0f;
+                currentAxis = axis;
+                currentLayer = cubeLayer;
+                
+            }
+            if (angleRotated < angleToRotate || isRotating)
+            {
+                isRotating = true;
+                
+            }
+            else
+            {
+                isRotating = false;
+                angleRotated = 0.0f;
+
+
+            }
+
+
+        }
+        public void RotateLayer(int cubeLayer, char axis, float angle)
+        {
+            //animating
+
+
             //Megcsinaljuk a megfelelo forgato matrixot
             Matrix4X4<float> rotation;
             switch (axis)
             {
-                case 'X': rotation = Matrix4X4.CreateRotationX((MathF.PI / 2f) * direction); break;
-                case 'Y': rotation = Matrix4X4.CreateRotationY((MathF.PI / 2f) * direction); break;
-                case 'Z': rotation = Matrix4X4.CreateRotationZ((MathF.PI / 2f) * direction); break;
+                case 'X': rotation = Matrix4X4.CreateRotationX((angle) * direction); break;
+                case 'Y': rotation = Matrix4X4.CreateRotationY((angle) * direction); break;
+                case 'Z': rotation = Matrix4X4.CreateRotationZ((angle) * direction); break;
                 default: return; // rossz tengely
             }
 
-            Console.WriteLine(cubeLayer); 
+            //Console.WriteLine(cubeLayer); 
 
-            List<float[]> newRubicsCube = new List<float[]>(Program.RubicsCube);
+            //List<float[]> newRubicsCube = new List<float[]>(Program.RubicsCube);
             List<int> layerIndexes = new List<int>(GetLayerIndexes(axis, cubeLayer));
 
             foreach (int index in layerIndexes)
             {
-                cubeTransMatrix[index] =  cubeTransMatrix[index] * rotation;
-                Program.RubicsCube[index] = UpdateCubePosition(newRubicsCube[index], axis);
+                Program.cubeTransMatrix[index] = Program.cubeTransMatrix[index] * rotation;
+                //Program.RubicsCube[index] = UpdateCubePosition(newRubicsCube[index], axis);
             }
            
 
