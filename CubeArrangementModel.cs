@@ -107,7 +107,7 @@ namespace Szeminarium
 
         }
 
-        //Kiszamitja a 90 fokkal elforgatott kocka trans matrixait
+        //Kiszamitja a 90 fokkal elforgatott kocka trans matrixait, hogy ne legyenek a float szamitasok miatti elteresek
         private Matrix4X4<float>[] CalculateFinalMatrixes(int cubeLayer, char axis, int[] layerIndexes)
         {
             Matrix4X4<float>[] finalMatrixes = (Matrix4X4<float>[])Program.cubeTransMatrix.Clone();

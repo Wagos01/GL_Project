@@ -15,6 +15,10 @@ namespace Szeminarium
 
         const double AngleChangeStepSize = Math.PI / 180 * 5;
 
+
+
+
+
         /// <summary>
         /// Gets the position of the camera.
         /// </summary>
@@ -34,6 +38,7 @@ namespace Szeminarium
             get
             {
                 return Vector3D.Normalize(GetPointFromAngles(DistanceToOrigin, AngleToZYPlane, AngleToZXPlane + Math.PI / 2));
+
             }
         }
 
@@ -45,9 +50,13 @@ namespace Szeminarium
             get
             {
                 // For the moment the camera is always pointed at the origin.
-                return Vector3D<float>.Zero;
+                return CameraPosition;
             }
         }
+
+
+
+
 
         public void IncreaseZXAngle()
         {
@@ -88,5 +97,45 @@ namespace Szeminarium
 
             return new Vector3D<float>((float)x, (float)y, (float)z);
         }
+
+        public Vector3D<float> CameraPosition { get; private set; } = Vector3D<float>.Zero;
+
+
+        public void MoveLeft(float distance)
+        {
+            Vector3D<float> direction = Vector3D.Normalize(Vector3D.Cross(UpVector, Target - Position));
+            CameraPosition += direction * distance;
+        }
+
+
+        public void MoveRight(float distance)
+        {
+            Vector3D<float> direction = Vector3D.Normalize(Vector3D.Cross(UpVector, Target - Position));
+            CameraPosition -= direction * distance;
+        }
+
+        public void MoveUp(float distance)
+        {
+            CameraPosition += UpVector * distance;
+        }
+
+        public void MoveDown(float distance)
+        {
+            CameraPosition -= UpVector * distance;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 }

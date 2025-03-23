@@ -180,11 +180,23 @@ namespace GrafikaSzeminarium
                 case Key.Up:
                     camera.DecreaseDistance();
                     break;
-                case Key.U:
+                case Key.Q:
                     camera.IncreaseZXAngle();
                     break;
-                case Key.D:
+                case Key.E:
                     camera.DecreaseZXAngle();
+                    break;
+                case Key.W:
+                    camera.MoveUp(1);
+                    break;
+                case Key.A:
+                    camera.MoveLeft(1);
+                    break;
+                case Key.S:
+                    camera.MoveDown(1);
+                    break;
+                case Key.D:
+                    camera.MoveRight(1);
                     break;
                 case Key.Space:
                     cubeArrangementModel.direction = cubeArrangementModel.direction * (-1);
