@@ -1,7 +1,11 @@
-﻿using Silk.NET.Maths;
+﻿using GrafikaSzeminarium;
+using Silk.NET.Input;
+using Silk.NET.Maths;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -57,28 +61,98 @@ namespace Szeminarium
             DiamondCubeGlobalYAngle = -Time;
         }
 
-        internal void RotateGroup(int[] group,ref Matrix4X4<float>[] cubeTransMatrix)
-        {
-            var rotation = CreateRotationMatrix(Vector3D<float>.UnitY, MathF.PI / 2);
+        internal void RotateHorizontalGroup(int index, ref Matrix4X4<float>[] cubeTransMatrix) { 
+            Matrix4X4<float> rotation = Matrix4X4.CreateRotationY(MathF.PI / 2);
+           
+            index = 3 * index;
 
-            foreach (var i in group)
-            {
-                cubeTransMatrix[i] = rotation * cubeTransMatrix[i];
+            int[] newOrder = new int[9];
+         
+            int move = 0;
+            int index2 = index;
+
+            int[] indexes = new int[9];
+            int i = 0;
+
+            while (i < 9) {
+                indexes[i] = index;
+                index++;
+                move++;
+                if (move == 3) {
+                    index += 6;
+                    move = 0;
+                }
+                i++;
+                //Console.Write(indexes[i-1]+" ");
             }
+            //Console.WriteLine();
+
+            for (i = 0; i < 9; i++)
+            {
+                cubeTransMatrix[Program.globalStatus[indexes[i]]] = rotation * cubeTransMatrix[Program.globalStatus[indexes[i]]];
+            }
+
+
+            newOrder[0] = Program.globalStatus[indexes[2]];
+            newOrder[1] = Program.globalStatus[indexes[5]];
+            newOrder[2] = Program.globalStatus[indexes[8]];
+            newOrder[3] = Program.globalStatus[indexes[1]];
+            newOrder[4] = Program.globalStatus[indexes[4]];
+            newOrder[5] = Program.globalStatus[indexes[7]];
+            newOrder[6] = Program.globalStatus[indexes[0]];
+            newOrder[7] = Program.globalStatus[indexes[3]];
+            newOrder[8] = Program.globalStatus[indexes[6]];
+
+
+            for (i = 0; i < 9; i++)
+            {
+                Program.globalStatus[indexes[i]] = newOrder[i];
+
+                //Write out
+               // Console.Write(Program.globalStatus[indexes[i]] + " ");
+            }
+
+
+
+          //  Console.WriteLine();
+
         }
 
-        private Matrix4X4<float> CreateRotationMatrix(Vector3D<float> axis, float angle)
-        {
-            var cos = MathF.Cos(angle);
-            var sin = MathF.Sin(angle);
-            var t = 1 - cos;
+        internal void RotateVerticalGroup(int index, ref Matrix4X4<float>[] cubeTransMatrix) {
+            Matrix4X4<float> rotation = Matrix4X4.CreateRotationX( MathF.PI / 2);
+            
+            index = 9* index;
+           
+            int[] newOrder = new int[9];
 
-            return new Matrix4X4<float>(
-                t * axis.X * axis.X + cos, t * axis.X * axis.Y - sin * axis.Z, t * axis.X * axis.Z + sin * axis.Y, 0,
-                t * axis.X * axis.Y + sin * axis.Z, t * axis.Y * axis.Y + cos, t * axis.Y * axis.Z - sin * axis.X, 0,
-                t * axis.X * axis.Z - sin * axis.Y, t * axis.Y * axis.Z + sin * axis.X, t * axis.Z * axis.Z + cos, 0,
-                0, 0, 0, 1
-            );
+            for (int i = index; i < index + 9; i++)
+            {
+                cubeTransMatrix[Program.globalStatus[i]]= rotation * cubeTransMatrix[Program.globalStatus[i]];
+            }
+
+            newOrder[0] = Program.globalStatus[index+2];
+            newOrder[1] = Program.globalStatus[index+5];
+            newOrder[2] = Program.globalStatus[index+8];
+            newOrder[3] = Program.globalStatus[index + 1];
+            newOrder[4] = Program.globalStatus[index + 4];
+            newOrder[5] = Program.globalStatus[index + 7];
+            newOrder[6] = Program.globalStatus[index + 0];
+            newOrder[7] = Program.globalStatus[index + 3];
+            newOrder[8] = Program.globalStatus[index + 6];
+
+
+            for (int i = index; i < index + 9; i++)
+            {
+                Program.globalStatus[i] = newOrder[i - index];
+
+                //Console.Write(Program.globalStatus[i] + " ");
+            }
+
+            //Console.WriteLine();
+
         }
+       
+
+       
     }
 }

@@ -2,6 +2,7 @@
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
+using System.Collections.Generic;
 using Szeminarium;
 
 namespace GrafikaSzeminarium
@@ -16,8 +17,6 @@ namespace GrafikaSzeminarium
 
         private static Matrix4X4<float>[] cubeTransMatrix = new Matrix4X4<float>[27];//MInden kockanak egy sajat transzformacio matrix
 
-        private static List<int[]> rubicGroupIndexes = new List<int[]>(); //6 felekeppen lehet egy rubik kockat forgatni, itt a kicsi kockakat hozza rendeljuk a forgatasokhoz
-
         private static CameraDescriptor camera = new CameraDescriptor();
 
         private static CubeArrangementModel cubeArrangementModel = new CubeArrangementModel();
@@ -25,6 +24,12 @@ namespace GrafikaSzeminarium
         private const string ModelMatrixVariableName = "uModel";
         private const string ViewMatrixVariableName = "uView";
         private const string ProjectionMatrixVariableName = "uProjection";
+
+
+        public static int[] globalStatus = new int[27];
+
+        public static List<float[]> RubicsCube = new List<float[]>();
+
 
         private static readonly string VertexShaderSource = @"
         #version 330 core
@@ -99,13 +104,21 @@ namespace GrafikaSzeminarium
             {
                 cube[i] = ModelObjectDescriptor.CreateCube(Gl, i);
                 cubeTransMatrix[i] = Matrix4X4<float>.Identity;
-            }
+                globalStatus[i] = i;
 
-            for(int i = 0; i < 6; i++)
+            }
+           
+            for (int i = -1; i <= 1; i++)
             {
-                rubicGroupIndexes.Add(new int[9]);//1 oldalon 9 kocka van, 1 forgatassal 9 kocka forgatodik
-            }
+                for (int j = -1; j <= 1; j++)
+                {
+                    for (int k = -1; k <= 1; k++)
+                    {
+                        RubicsCube.Add(new float[] { i, j, k });
 
+                    }
+                }
+            }
 
             SetUpRotations();
 
@@ -156,6 +169,7 @@ namespace GrafikaSzeminarium
 
         private static void Keyboard_KeyDown(IKeyboard keyboard, Key key, int arg3)
         {
+            int index = -1;
             switch (key)
             {
                 case Key.Left:
@@ -179,17 +193,41 @@ namespace GrafikaSzeminarium
                 case Key.Space:
                     cubeArrangementModel.AnimationEnabled = !cubeArrangementModel.AnimationEnabled;
                     break;
-                case Key.Number1:
+                case Key.Number1:   
                 case Key.Number2:
                 case Key.Number3:
+                    index = key - Key.Number1;
+                    cubeArrangementModel.RotateHorizontalGroup(index, ref cubeTransMatrix);
+                    break;
                 case Key.Number4:
                 case Key.Number5:
                 case Key.Number6:
-                    cubeArrangementModel.RotateGroup(rubicGroupIndexes[key - Key.Number1], ref cubeTransMatrix);
-                    graphicWindow.DoRender();
+                    index = key - Key.Number1;
+                    cubeArrangementModel.RotateVerticalGroup(index-3, ref cubeTransMatrix);
                     break;
-
+                case Key.Number7:
+                case Key.Number8:
+                case Key.Number9:
+                    index = key - Key.Number1;
+                    break;
             }
+
+            //Write out the global status of the cubes
+
+            for (int i = 0; i < 27; i++)
+            {
+                Console.Write(globalStatus[i] + " ");
+            }
+            Console.WriteLine();
+
+
+            //if(index != -1 && index<4)
+            //{
+            //    var newGroup = rubicGroupIndexes[index];
+            //    cubeArrangementModel.CubeMatrixRearrange(ref newGroup);
+            //    rubicGroupIndexes[index] = newGroup;
+            //}
+
         }
 
         private static void GraphicWindow_Update(double deltaTime)
@@ -222,7 +260,7 @@ namespace GrafikaSzeminarium
         {
             Matrix4X4<float> rubicsScale = Matrix4X4.CreateScale((float)cubeArrangementModel.RubikCubeScale);
 
-            float dist = 0.31f;
+            float dist = 0.5f;
 
             int cubeIndex = 0;
 
@@ -233,7 +271,7 @@ namespace GrafikaSzeminarium
                     for (float k = -1; k <= 1; k++)
                     {
                         Matrix4X4<float> trans = Matrix4X4.CreateTranslation(i * dist, j * dist, k * dist);
-                        Matrix4X4<float> modelMatrixRubicsScube = rubicsScale * trans * cubeTransMatrix[cubeIndex];
+                        Matrix4X4<float> modelMatrixRubicsScube = rubicsScale * trans * cubeTransMatrix[globalStatus[cubeIndex]];
                         SetMatrix(modelMatrixRubicsScube, ModelMatrixVariableName);
                         DrawModelObject(cube[cubeIndex]);
                         cubeIndex++;
@@ -269,26 +307,7 @@ namespace GrafikaSzeminarium
         //itt a kicsi kockakat hozza rendeljuk a forgatasokhoz
         private static void SetUpRotations()
         {
-            //az elso 3 a vizszintes forgatasok
-            //masodik 3 a fuggoleges forgatasok
-            rubicGroupIndexes[0] = (new int[] { 0, 1, 2, 9, 10, 11, 18, 19, 20 });
-            rubicGroupIndexes[1] = (new int[] { 3, 4, 5, 12, 13, 14, 21, 22, 23 });
-            rubicGroupIndexes[2] = (new int[] { 6, 7, 8, 15, 16, 17, 24, 25, 26 }); 
-
-            for (int i = 3; i < 6; i++) {
-                for(int j = 0; j < 9; j++) {
-                    rubicGroupIndexes[i][j] = (i-3)*9 + j;
-                }
-            }
-
-            /*for(int i = 0; i < 6; i++)
-            {
-                for (int j = 0; j < 9; j++)
-                {
-                    Console.Write(rubicGroupIndexes[i][j] + " ");
-                }
-                Console.WriteLine();
-            }*/
+           
         }
 
 
