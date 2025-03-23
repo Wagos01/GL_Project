@@ -193,18 +193,19 @@ namespace GrafikaSzeminarium
                 case Key.Number1:   
                 case Key.Number2:
                 case Key.Number3:
-                    index = key - Key.Number1;
+                    index = key - (Key.Number1+1);
                     cubeArrangementModel.Rotate(index,'X', ref cubeTransMatrix);
                     break;
                 case Key.Number4:
                 case Key.Number5:
                 case Key.Number6:
-                    index = key - Key.Number1;
+                    index = key - (Key.Number1 + 1);
                     cubeArrangementModel.Rotate(index-3,'Y' ,ref cubeTransMatrix);
                     break;
                 case Key.Number7:
                 case Key.Number8:
                 case Key.Number9:
+                    index = key - (Key.Number1 + 1);
                     cubeArrangementModel.Rotate(index - 6,'Z',ref cubeTransMatrix);
                     break;
             }
@@ -249,7 +250,7 @@ namespace GrafikaSzeminarium
         {
             Matrix4X4<float> rubicsScale = Matrix4X4.CreateScale((float)cubeArrangementModel.RubikCubeScale);
 
-            float dist = 0.5f;
+            float dist = 0.35f;
 
             int cubeIndex = 0;
 
