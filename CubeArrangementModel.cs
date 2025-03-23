@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -50,6 +51,7 @@ namespace Szeminarium
 
         private char currentAxis;
         private int currentLayer;
+        private Matrix4X4<float>[] currentTransMatrix; 
         //cubeTransMatrix
 
         internal void AdvanceTime(double deltaTime)
@@ -70,6 +72,7 @@ namespace Szeminarium
                     {
                         Program.RubicsCube[index] = UpdateCubePosition(newRubicsCube[index], currentAxis);
                     }
+                    Program.cubeTransMatrix = currentTransMatrix;
                 }
                 else
                 {
@@ -88,7 +91,7 @@ namespace Szeminarium
                 angleRotated = 0.0f;
                 currentAxis = axis;
                 currentLayer = cubeLayer;
-                
+                currentTransMatrix = CalculateFinalMatrixes(cubeLayer, axis, GetLayerIndexes(currentAxis, currentLayer));
             }
             if (angleRotated < angleToRotate || isRotating)
             {
@@ -99,16 +102,37 @@ namespace Szeminarium
             {
                 isRotating = false;
                 angleRotated = 0.0f;
-
-
             }
 
 
         }
+
+        //Kiszamitja a 90 fokkal elforgatott kocka trans matrixait
+        private Matrix4X4<float>[] CalculateFinalMatrixes(int cubeLayer, char axis, int[] layerIndexes)
+        {
+            Matrix4X4<float>[] finalMatrixes = (Matrix4X4<float>[])Program.cubeTransMatrix.Clone();
+            Matrix4X4<float> rotation;
+            switch (axis)
+            {
+                case 'X': rotation = (Matrix4X4<float>)Matrix4X4.CreateRotationX((Math.PI / 2f) * direction); break;
+                case 'Y': rotation = (Matrix4X4<float>)Matrix4X4.CreateRotationY((Math.PI / 2f) * direction); break;
+                case 'Z': rotation = (Matrix4X4<float>)Matrix4X4.CreateRotationZ((Math.PI / 2f) * direction); break;
+                default: throw new Exception("rossz tengely");
+            }
+
+            foreach (int index in layerIndexes)
+            {
+                finalMatrixes[index] = finalMatrixes[index] * rotation;
+            }
+
+            return finalMatrixes;
+        }
+
+
+
         public void RotateLayer(int cubeLayer, char axis, float angle)
         {
-            //animating
-
+         
 
             //Megcsinaljuk a megfelelo forgato matrixot
             Matrix4X4<float> rotation;
