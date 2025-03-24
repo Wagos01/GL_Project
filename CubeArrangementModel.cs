@@ -44,6 +44,8 @@ namespace Szeminarium
         public float direction { get;  set; } = 1;
 
         public static bool isRotating { get; private set; } = false;
+        public static bool isRandom { get; private set; } = false;
+        private static int randomCounter = 0;
 
         private float angleToRotate = (float)(Math.PI / 2f);//in radian
         private float angleRotated = 0.0f;
@@ -51,14 +53,74 @@ namespace Szeminarium
 
         private char currentAxis;
         private int currentLayer;
-        private Matrix4X4<float>[] currentTransMatrix; 
+        private Matrix4X4<float>[] currentTransMatrix;
         //cubeTransMatrix
 
+        private Random rand = new Random();
+        char randomAxis;
+        float randomDirection;
+        int randomLayer;
+
+
+        public void startRandom()
+        {
+            isRandom = true;
+            randomCounter = 0;
+            angleRotated = 0;
+
+            //TODO random forgatas
+            randomAxis = (char)('X' + rand.Next(3));
+            randomDirection = rand.Next(2) * 2 - 1;//-1 vagy 1
+            randomLayer = rand.Next(3) - 1;//-1, 0 vagy 1
+
+            currentTransMatrix = CalculateFinalMatrixes(randomLayer, randomAxis, GetLayerIndexes(randomAxis, randomLayer), randomDirection);
+
+        }
         internal void AdvanceTime(double deltaTime)
         {
+            if (isRandom)
+            {
+                if (randomCounter < 30)
+                {
+
+
+
+                    angleRotated += 5 * (float)deltaTime;
+
+                    if (angleRotated >= angleToRotate)
+                    {
+                        randomCounter++;
+                        
+                        angleRotated = 0.0f;
+
+                        List<int> layerIndexes = new List<int>(GetLayerIndexes(randomAxis, randomLayer));
+                        List<float[]> newRubicsCube = new List<float[]>(Program.RubicsCube);
+
+                        foreach (int index in layerIndexes)
+                        {
+                            Program.RubicsCube[index] = UpdateCubePosition(newRubicsCube[index], randomAxis,randomDirection);
+                        }
+                        Program.cubeTransMatrix = currentTransMatrix;
+
+                        //calculate the next rotation
+                        randomAxis = (char)('X' + rand.Next(3));
+                        randomDirection = rand.Next(2) * 2 - 1;//-1 vagy 1
+                        randomLayer = rand.Next(3) - 1;//-1, 0 vagy 1
+                        
+                        currentTransMatrix = CalculateFinalMatrixes(randomLayer, randomAxis, GetLayerIndexes(randomAxis, randomLayer), randomDirection);
+                    }
+                    else
+                    {
+                        RotateLayer(randomLayer, randomAxis, 5 * (float)deltaTime,  randomDirection);
+                    }
+                } else
+                {
+                    isRandom = false;
+                }
+            }
             if (isRotating)
             {
-                angleRotated += 2*(float)deltaTime;
+                angleRotated += 2 * (float)deltaTime;
 
                 if (angleRotated >= angleToRotate)
                 {
@@ -70,18 +132,18 @@ namespace Szeminarium
 
                     foreach (int index in layerIndexes)
                     {
-                        Program.RubicsCube[index] = UpdateCubePosition(newRubicsCube[index], currentAxis);
+                        Program.RubicsCube[index] = UpdateCubePosition(newRubicsCube[index], currentAxis, direction);
                     }
                     Program.cubeTransMatrix = currentTransMatrix;
                 }
                 else
                 {
-                    RotateLayer(currentLayer, currentAxis,2* (float)deltaTime);
+                    RotateLayer(currentLayer, currentAxis, 2 * (float)deltaTime, direction);
 
                 }
-            }
-            
+            } 
         }
+        
 
         public void Rotate(int cubeLayer, char axis)
         {
@@ -91,7 +153,7 @@ namespace Szeminarium
                 angleRotated = 0.0f;
                 currentAxis = axis;
                 currentLayer = cubeLayer;
-                currentTransMatrix = CalculateFinalMatrixes(cubeLayer, axis, GetLayerIndexes(currentAxis, currentLayer));
+                currentTransMatrix = CalculateFinalMatrixes(cubeLayer, axis, GetLayerIndexes(currentAxis, currentLayer), direction);
             }
             if (angleRotated < angleToRotate || isRotating)
             {
@@ -108,7 +170,7 @@ namespace Szeminarium
         }
 
         //Kiszamitja a 90 fokkal elforgatott kocka trans matrixait, hogy ne legyenek a float szamitasok miatti elteresek
-        private Matrix4X4<float>[] CalculateFinalMatrixes(int cubeLayer, char axis, int[] layerIndexes)
+        private Matrix4X4<float>[] CalculateFinalMatrixes(int cubeLayer, char axis, int[] layerIndexes,float direction)
         {
             Matrix4X4<float>[] finalMatrixes = (Matrix4X4<float>[])Program.cubeTransMatrix.Clone();
             Matrix4X4<float> rotation;
@@ -130,7 +192,7 @@ namespace Szeminarium
 
 
 
-        public void RotateLayer(int cubeLayer, char axis, float angle)
+        public void RotateLayer(int cubeLayer, char axis, float angle,float direction)
         {
          
 
@@ -157,7 +219,7 @@ namespace Szeminarium
            
 
         }
-        private float[] UpdateCubePosition(float[] pos, char axis)
+        private float[] UpdateCubePosition(float[] pos, char axis, float direction)
         {
             float[] newPos = new float[3];
             switch (axis)

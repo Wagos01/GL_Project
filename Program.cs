@@ -201,11 +201,18 @@ namespace GrafikaSzeminarium
                 case Key.Space:
                     cubeArrangementModel.direction = cubeArrangementModel.direction * (-1);
                     break;
-
+                case Key.R:
+                    if (CubeArrangementModel.isRotating || CubeArrangementModel.isRandom)
+                    {
+                        break;
+                    }
+                    //starting random
+                    cubeArrangementModel.startRandom();
+                    break;
                 case Key.Number1:   
                 case Key.Number2:
                 case Key.Number3:
-                    if(CubeArrangementModel.isRotating)
+                    if (CubeArrangementModel.isRotating || CubeArrangementModel.isRandom)
                     {
                         break;
                     }
@@ -215,7 +222,7 @@ namespace GrafikaSzeminarium
                 case Key.Number4:
                 case Key.Number5:
                 case Key.Number6:
-                    if (CubeArrangementModel.isRotating)
+                    if (CubeArrangementModel.isRotating || CubeArrangementModel.isRandom)
                     {
                         break;
                     }
@@ -225,7 +232,7 @@ namespace GrafikaSzeminarium
                 case Key.Number7:
                 case Key.Number8:
                 case Key.Number9:
-                    if (CubeArrangementModel.isRotating)
+                    if (CubeArrangementModel.isRotating || CubeArrangementModel.isRandom)
                     {
                         break;
                     }
