@@ -14,31 +14,37 @@ namespace Szeminarium
 {
     internal class CubeArrangementModel
     {
-        /// <summary>
-        /// Gets or sets wheather the animation should run or it should be frozen.
-        /// </summary>
-        public bool AnimationEnabled { get; set; } = false;
+        
 
-        /// <summary>
-        /// The time of the simulation. It helps to calculate time dependent values.
-        /// </summary>
-        private double Time { get; set; } = 0;
 
-        /// <summary>
-        /// The value by which the center cube is scaled. It varies between 0.8 and 1.2 with respect to the original size.
-        /// </summary>
-        public double CenterCubeScale { get; private set; } = 1;
         public double RubikCubeScale { get; private set; } = 0.3;
+        public float RubikCubeRotation { get; private set; } = 0.0f;
+        public bool isSolved { get; set; } = false;
 
-        /// <summary>
-        /// The angle with which the diamond cube is rotated around the diagonal from bottom right front to top left back.
-        /// </summary>
-        public double DiamondCubeLocalAngle { get; private set; } = 0;
+        public static double Time = 0;
 
-        /// <summary>
-        /// The angle with which the diamond cube is rotated around the global Y axes.
-        /// </summary>
-        public double DiamondCubeGlobalYAngle { get; private set; } = 0;
+        public void RubicsCubeAnimation(double deltaTime)
+        {
+            if(!isSolved)
+            {
+                return;
+            }
+
+            Time += deltaTime;
+
+            RubikCubeScale = 0.3 + 0.2 * Math.Sin(0.7 * Time);
+            RubikCubeRotation =(float)Time;
+
+            //5 masodpercig fog villogni
+            if (Time >= 5)
+            {
+                Time = 0;
+                isSolved = false;
+                RubikCubeScale = 0.3;
+                RubikCubeRotation = 0.0f;
+            }
+        }
+
 
         ///forgatas iranya
         public float direction { get;  set; } = 1;
@@ -68,7 +74,6 @@ namespace Szeminarium
             randomCounter = 0;
             angleRotated = 0;
 
-            //TODO random forgatas
             randomAxis = (char)('X' + rand.Next(3));
             randomDirection = rand.Next(2) * 2 - 1;//-1 vagy 1
             randomLayer = rand.Next(3) - 1;//-1, 0 vagy 1
@@ -78,6 +83,7 @@ namespace Szeminarium
         }
         internal void AdvanceTime(double deltaTime)
         {
+            RubicsCubeAnimation(deltaTime);
             if (isRandom)
             {
                 if (randomCounter < 30)
@@ -85,7 +91,7 @@ namespace Szeminarium
 
 
 
-                    angleRotated += 5 * (float)deltaTime;
+                    angleRotated += 8 * (float)deltaTime;
 
                     if (angleRotated >= angleToRotate)
                     {
@@ -111,7 +117,7 @@ namespace Szeminarium
                     }
                     else
                     {
-                        RotateLayer(randomLayer, randomAxis, 5 * (float)deltaTime,  randomDirection);
+                        RotateLayer(randomLayer, randomAxis, 8 * (float)deltaTime,  randomDirection);
                     }
                 } else
                 {
@@ -120,7 +126,7 @@ namespace Szeminarium
             }
             if (isRotating)
             {
-                angleRotated += 2 * (float)deltaTime;
+                angleRotated += 3 * (float)deltaTime;
 
                 if (angleRotated >= angleToRotate)
                 {
@@ -135,10 +141,18 @@ namespace Szeminarium
                         Program.RubicsCube[index] = UpdateCubePosition(newRubicsCube[index], currentAxis, direction);
                     }
                     Program.cubeTransMatrix = currentTransMatrix;
+
+                    //Ellenorizzuk hogy sikerulte kirakjuk
+                    if (Program.CheckIfSolved())
+                    {
+                        isSolved = true;
+                    }
+
+
                 }
                 else
                 {
-                    RotateLayer(currentLayer, currentAxis, 2 * (float)deltaTime, direction);
+                    RotateLayer(currentLayer, currentAxis, 3 * (float)deltaTime, direction);
 
                 }
             } 

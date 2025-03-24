@@ -27,6 +27,8 @@ namespace GrafikaSzeminarium
 
 
         public static List<float[]> RubicsCube = new List<float[]>();
+        public static List<float[]> RubicsCubeSolved = new List<float[]>();
+       
 
 
         private static readonly string VertexShaderSource = @"
@@ -111,12 +113,11 @@ namespace GrafikaSzeminarium
                     for (int k = -1; k <= 1; k++)
                     {
                         RubicsCube.Add(new float[] { i, j, k });
+                        RubicsCubeSolved.Add(new float[] { i, j, k });
 
                     }
                 }
             }
-
-            SetUpRotations();
 
             Gl.ClearColor(System.Drawing.Color.White);
             
@@ -276,7 +277,7 @@ namespace GrafikaSzeminarium
         {
             Matrix4X4<float> rubicsScale = Matrix4X4.CreateScale((float)cubeArrangementModel.RubikCubeScale);
 
-            float dist = 0.32f;
+            float dist = 1.10f * (float)cubeArrangementModel.RubikCubeScale;
 
             int cubeIndex = 0;
 
@@ -287,7 +288,10 @@ namespace GrafikaSzeminarium
                     for (float k = -1; k <= 1; k++)
                     {
                         Matrix4X4<float> trans = Matrix4X4.CreateTranslation(i * dist, j * dist, k * dist);
-                        Matrix4X4<float> modelMatrixRubicsScube = rubicsScale * trans * cubeTransMatrix[cubeIndex];
+                        Matrix4X4<float> rotAnimating = Matrix4X4.CreateRotationY((float)cubeArrangementModel.RubikCubeRotation);
+
+                        Matrix4X4<float> modelMatrixRubicsScube = rubicsScale * trans * cubeTransMatrix[cubeIndex] * rotAnimating;
+
                         SetMatrix(modelMatrixRubicsScube, ModelMatrixVariableName);
                         DrawModelObject(cube[cubeIndex]);
                         cubeIndex++;
@@ -319,12 +323,7 @@ namespace GrafikaSzeminarium
             CheckError();
         }
 
-        //6 felekeppen lehet egy rubik kockat forgatni,
-        //itt a kicsi kockakat hozza rendeljuk a forgatasokhoz
-        private static void SetUpRotations()
-        {
-           
-        }
+        
 
 
         public static void CheckError()
@@ -332,6 +331,18 @@ namespace GrafikaSzeminarium
             var error = (ErrorCode)Gl.GetError();
             if (error != ErrorCode.NoError)
                 throw new Exception("GL.GetError() returned " + error.ToString());
+        }
+
+        internal static bool CheckIfSolved()
+        {
+            for (int i = 0; i < 27; i++)
+            {
+                if (RubicsCube[i][0] != RubicsCubeSolved[i][0] || RubicsCube[i][1] != RubicsCubeSolved[i][1] || RubicsCube[i][2] != RubicsCubeSolved[i][2])
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }
